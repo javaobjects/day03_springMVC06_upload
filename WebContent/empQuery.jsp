@@ -53,5 +53,8 @@
 		<input type="submit" value="批量删除">
 		<input type="button" value="新增" onclick="window.location.href='${pageContext.request.contextPath}/empInsert.jsp'">
 	</form>
+	
+	刚刚新鲜上的照片:
+	<img alt="${fileName}" src="${filePath}">
 </body>
 </html>

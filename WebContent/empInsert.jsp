@@ -14,7 +14,7 @@
 			<font color="red" size="-1">${error.defaultMessage}</font><br/><br/>
 		</c:forEach>
 	</h5>
-	<form action="${pageContext.request.contextPath}/emp/insertEmp.action" method="post">
+	<form action="${pageContext.request.contextPath}/emp/insertEmp.action" method="post" enctype="multipart/form-data">
 		流水号：<input type="text" name="id" value="${id}"><br/><br/>
 		雇员编号:<input type="text" name="empno" value="${emp.empno}"><br/><br/>
 		雇员姓名:<input type="text" name="ename" value="${emp.ename}"><br/><br/>
@@ -31,6 +31,7 @@
 					<option value="40" ${emp.dept.deptno eq 40 ? "selected" : "" }>测试部</option>
 					<option value="50" ${emp.dept.deptno eq 50 ? "selected" : "" }>实施部</option>
 				</select><br/><br/>
+				头像：<input type="file" name="photo"><br/><br/>
 				<input type="submit" value="提交新增">
 	</form>
 </body>

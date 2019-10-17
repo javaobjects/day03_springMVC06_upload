@@ -1,8 +1,10 @@
 package com.tencent.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -18,6 +20,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tencent.group.Goup1;
 import com.tencent.group.Goup2;
@@ -200,9 +203,12 @@ public class EmpController {
 	 * @param emp
 	 * @param bindingResult
 	 * @return
+	 * @throws IOException 
+	 * @throws IllegalStateException 
 	 */
 	@RequestMapping("/insertEmp")
-	public String insertEmp(Model model,@Validated(value = {Goup1.class,Goup2.class}) Emp emp,BindingResult bindingResult,Integer id) {
+	public String insertEmp(Model model,MultipartFile photo,@Validated(value = {Goup1.class,Goup2.class}) Emp emp,
+			BindingResult bindingResult,Integer id) throws IllegalStateException, IOException {
 		//判断是否有错误结果
 		if(bindingResult.hasErrors()) {
 			//获取错误结果
@@ -230,9 +236,30 @@ public class EmpController {
 		
 		System.out.println("新增用户的信息:" + emp);
 		
+		//上传头像
+		String fileName = photo.getOriginalFilename();
+		System.out.println("源文件名称:" + fileName);//3.jpg
+		
+		//获取扩展名
+		String suffix = fileName.substring(fileName.lastIndexOf("."));//.jpg
+		System.out.println("扩展名:" + suffix);
+		
+		//新文件名称
+		//String newFileName = new Date().getTime() + suffix;//毫秒值唯一
+		String newFileName = UUID.randomUUID() + suffix;//生成唯一值
+		System.out.println("新文件名称： " + newFileName);//954fa011-59b0-446a-a176-35139fcb9846.jpg
+		
+		//上传文件
+		File file = new File("D:\\temp\\" + newFileName);
+		photo.transferTo(file);
+		System.out.println("文件上传是否成功：" + file.exists() + "" + file.getAbsolutePath());
+		
+		//将文件名称与路径保存在request作用域中
+		model.addAttribute("fileName",fileName);
+		model.addAttribute("filePath","/photo/" + newFileName);
+		
 		//调用service方法完成新增
 		boolean result = empService.insertEmp(emp);
-		
 		
 		return "forward:/emp/get.action";
 	}
