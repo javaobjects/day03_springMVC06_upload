@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	                       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	                       http://www.springframework.org/schema/context
+	                       http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	                       http://www.springframework.org/schema/aop
+	                       http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+	                       http://www.springframework.org/schema/mvc
+	                       http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
+
+	<!-- 1.开启注解方式的处理器映射器、处理器适配器 -->
+	<mvc:annotation-driven conversion-service="conversionService" validator="validator"/>
+
+	<!-- 2.处理器 -->
+	<context:component-scan base-package="com.tencent"></context:component-scan>
+	
+	<!-- 3.视图解析器 -->	    
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+			<!-- 前缀 -->
+			<property name="prefix" value="/"></property>
+			<!-- 后缀 -->
+			<property name="suffix" value=".jsp"></property>
+	</bean>    
+	<!-- 4. 自定义参数配置 -->
+	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<!-- 自定义转换器 -->
+		<property name="converters">
+			<set>
+				<bean class="com.tencent.converter.CustomerDateConverter"></bean>
+			</set>
+		</property>
+	</bean>
+<!-- 5.配置校验器 -->
+<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+	<!-- 校验器提供者 -->
+	<property name="providerClass" value="org.hibernate.validator.HibernateValidator"></property>
+	
+	<!-- 错误信息文件,如果不配置，默认读取src路径下的ValidationMessages.properties文件 -->
+	<property name="validationMessageSource" ref="messageSource"></property>
+</bean>
+
+<!-- 5.1 读取外部错误信息配置文件 -->
+<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<!-- 外部文件路径 -->
+		<property name="basenames">
+			<list>
+				<value>classpath:CustomerValidationMessages</value>
+			</list>
+		</property>
+		
+		<!-- 指定文件编码格式 -->
+		<property name="defaultEncoding" value="utf-8"></property>
+		
+		<!-- 设置缓存时间（秒为单位） :缓存1分钟-->
+		<property name="cacheSeconds" value="60"></property>
+</bean> 
+<!-- 6. 配置全局异常处理器 -->
+<bean id="exceptionHandler" class="com.tencent.exception.CustomerExceptionHandler"></bean>
+
+    
+</beans>
